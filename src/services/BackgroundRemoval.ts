@@ -1,4 +1,4 @@
-import * as FileSystem from "expo-file-system";
+import * as FileSystem from "expo-file-system/legacy";
 
 const FAL_API_KEY = process.env.EXPO_PUBLIC_FAL_KEY;
 const API_ENDPOINT = "https://queue.fal.run/fal-ai/birefnet/v2";
