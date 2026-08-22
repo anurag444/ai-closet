@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import FadeInView from "./FadeInView";
 import { palette, spacing, radius, fontFamily, fontSize } from "../../styles/theme";
 
 type Props = {
@@ -11,13 +11,13 @@ type Props = {
 };
 
 const EmptyState = ({ icon, title, message }: Props) => (
-  <Animated.View entering={FadeInDown.duration(400)} style={styles.container}>
+  <FadeInView duration={400} style={styles.container}>
     <View style={styles.iconCircle}>
       <MaterialCommunityIcons name={icon} size={34} color={palette.rose} />
     </View>
     <Text style={styles.title}>{title}</Text>
     <Text style={styles.message}>{message}</Text>
-  </Animated.View>
+  </FadeInView>
 );
 
 const styles = StyleSheet.create({

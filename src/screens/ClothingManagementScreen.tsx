@@ -1,6 +1,5 @@
 import React, { useCallback, useContext, useState } from "react";
-import { Text, StyleSheet, FlatList, ScrollView, Pressable, Alert } from "react-native";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import { Text, StyleSheet, FlatList, ScrollView, Pressable, Alert, Dimensions } from "react-native";
 import { SafeAreaView, Edge } from "react-native-safe-area-context";
 import * as ImagePicker from "expo-image-picker";
 import { ClothingContext } from "../contexts/ClothingContext";
@@ -14,9 +13,17 @@ import DeleteButton from "../components/common/DeleteButton";
 import { categories } from "../data/categories";
 import ScreenHeader from "../components/common/ScreenHeader";
 import EmptyState from "../components/common/EmptyState";
+import FadeInView from "../components/common/FadeInView";
 import { palette, spacing, radius, fontFamily, fontSize } from "../styles/theme";
 
 type Props = ClosetStackScreenProps<"ClothingManagement">;
+
+const { width: SCREEN_WIDTH } = Dimensions.get("window");
+const COLUMN_COUNT = 3;
+const GRID_PADDING = 10;
+// Fixed pixel cells rather than flex: Reanimated's entering animation measures
+// flex children unreliably on Android and can render them at zero width
+const CELL_SIZE = (SCREEN_WIDTH - GRID_PADDING * 2) / COLUMN_COUNT;
 
 interface CategoryTabProps {
   name: string;
@@ -169,7 +176,7 @@ const ClothingManagementScreen = ({ navigation }: Props) => {
   const renderItem = ({ item, index }: { item: ClothingItem; index: number }) => (
     // The wrapper owns the grid cell; the thumbnail just fills it. Without the
     // sizing here its own flex: 1/3 resolves against a zero-width parent.
-    <Animated.View style={styles.gridItem} entering={FadeInDown.delay(Math.min(index, 11) * 40).duration(320)}>
+    <FadeInView style={styles.gridItem} delay={Math.min(index, 11) * 40}>
       <ClothingItemThumbnail
         containerStyle={styles.gridItemFill}
         item={item}
@@ -178,7 +185,7 @@ const ClothingManagementScreen = ({ navigation }: Props) => {
         isSelectable={isSelectionMode}
         isSelected={selectedItems.has(item.id)}
       />
-    </Animated.View>
+    </FadeInView>
   );
 
   const safeAreaEdges: Edge[] = ["top", "left", "right"];
@@ -227,7 +234,7 @@ const ClothingManagementScreen = ({ navigation }: Props) => {
         data={filteredItems}
         renderItem={renderItem}
         keyExtractor={(item) => item.id}
-        numColumns={3}
+        numColumns={COLUMN_COUNT}
         contentContainerStyle={[styles.gridContent, isSelectionMode && styles.gridContentWithDelete]}
         ListEmptyComponent={
           clothingItems.length === 0 ? (
@@ -298,15 +305,17 @@ const styles = StyleSheet.create({
     color: palette.shell,
   },
   gridItem: {
-    flex: 1 / 3,
-    aspectRatio: 1,
+    width: CELL_SIZE,
+    height: CELL_SIZE,
   },
   gridItemFill: {
-    flex: 1,
+    width: "100%",
+    height: "100%",
+    flex: 0,
   },
   gridContent: {
     paddingTop: spacing.sm,
-    paddingHorizontal: 10,
+    paddingHorizontal: GRID_PADDING,
     paddingBottom: spacing.xxl,
   },
   gridContentWithDelete: {
