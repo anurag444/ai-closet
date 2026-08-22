@@ -1,7 +1,7 @@
 import React, { useCallback, useContext, useState } from "react";
-import { View, Text, StyleSheet, FlatList, ScrollView, Pressable, Alert } from "react-native";
+import { Text, StyleSheet, FlatList, ScrollView, Pressable, Alert } from "react-native";
+import Animated, { FadeInDown } from "react-native-reanimated";
 import { SafeAreaView, Edge } from "react-native-safe-area-context";
-import { MaterialIcons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import { ClothingContext } from "../contexts/ClothingContext";
 import { ClothingItem } from "../types/ClothingItem";
@@ -12,8 +12,9 @@ import TagFilterSection from "../components/common/TagFilterSection";
 import DeleteModeHeader from "../components/common/DeleteModeHeader";
 import DeleteButton from "../components/common/DeleteButton";
 import { categories } from "../data/categories";
-import { colors } from "../styles/colors";
-import { typography } from "../styles/globalStyles";
+import ScreenHeader from "../components/common/ScreenHeader";
+import EmptyState from "../components/common/EmptyState";
+import { palette, spacing, radius, fontFamily, fontSize } from "../styles/theme";
 
 type Props = ClosetStackScreenProps<"ClothingManagement">;
 
@@ -45,6 +46,7 @@ const ClothingManagementScreen = ({ navigation }: Props) => {
   }
 
   const {
+    clothingItems,
     categoryData,
     tagData,
     filteredItems,
@@ -164,14 +166,19 @@ const ClothingManagementScreen = ({ navigation }: Props) => {
     setFilter("tags", newTags);
   };
 
-  const renderItem = ({ item }: { item: ClothingItem }) => (
-    <ClothingItemThumbnail
-      item={item}
-      onPress={() => handleItemPress(item.id)}
-      onLongPress={() => handleLongPress(item.id)}
-      isSelectable={isSelectionMode}
-      isSelected={selectedItems.has(item.id)}
-    />
+  const renderItem = ({ item, index }: { item: ClothingItem; index: number }) => (
+    // The wrapper owns the grid cell; the thumbnail just fills it. Without the
+    // sizing here its own flex: 1/3 resolves against a zero-width parent.
+    <Animated.View style={styles.gridItem} entering={FadeInDown.delay(Math.min(index, 11) * 40).duration(320)}>
+      <ClothingItemThumbnail
+        containerStyle={styles.gridItemFill}
+        item={item}
+        onPress={() => handleItemPress(item.id)}
+        onLongPress={() => handleLongPress(item.id)}
+        isSelectable={isSelectionMode}
+        isSelected={selectedItems.has(item.id)}
+      />
+    </Animated.View>
   );
 
   const safeAreaEdges: Edge[] = ["top", "left", "right"];
@@ -182,12 +189,10 @@ const ClothingManagementScreen = ({ navigation }: Props) => {
       {isSelectionMode ? (
         <DeleteModeHeader selectedCount={selectedItems.size} onCancel={handleCancelSelection} />
       ) : (
-        <View style={styles.header}>
-          <Text style={styles.title}>My Closet</Text>
-          <Pressable>
-            <MaterialIcons name="filter-list" size={24} color={colors.icon_stroke} />
-          </Pressable>
-        </View>
+        <ScreenHeader
+          title="My Closet"
+          subtitle={`${clothingItems.length} ${clothingItems.length === 1 ? "piece" : "pieces"}`}
+        />
       )}
 
       {/* Category Tabs */}
@@ -224,6 +229,21 @@ const ClothingManagementScreen = ({ navigation }: Props) => {
         keyExtractor={(item) => item.id}
         numColumns={3}
         contentContainerStyle={[styles.gridContent, isSelectionMode && styles.gridContentWithDelete]}
+        ListEmptyComponent={
+          clothingItems.length === 0 ? (
+            <EmptyState
+              icon="hanger"
+              title="Your closet is waiting"
+              message="Add your first piece and I'll remove the background and tag it for you."
+            />
+          ) : (
+            <EmptyState
+              icon="magnify"
+              title="Nothing here yet"
+              message="No pieces match these filters. Try clearing one."
+            />
+          )
+        }
       />
 
       {/* Add Button or Delete Button */}
@@ -239,59 +259,55 @@ const ClothingManagementScreen = ({ navigation }: Props) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.screen_background,
-  },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: 16,
-    paddingTop: 16,
-    paddingBottom: 8,
-  },
-  title: {
-    fontSize: 24,
-    fontFamily: typography.bold,
-    color: colors.text_primary,
+    backgroundColor: palette.cream,
   },
   categoryTabsContainer: {
     maxHeight: 48,
   },
   categoryTabsContent: {
-    paddingHorizontal: 16,
+    paddingHorizontal: spacing.lg,
+    gap: spacing.sm,
   },
   categoryTab: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    marginRight: 8,
-    borderRadius: 20,
-    backgroundColor: colors.thumbnail_background,
+    gap: spacing.xs,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.sm,
+    borderRadius: radius.pill,
+    backgroundColor: palette.blush,
   },
   categoryTabSelected: {
-    backgroundColor: colors.primary_yellow,
+    backgroundColor: palette.rose,
   },
   categoryTabText: {
-    fontFamily: typography.medium,
-    fontSize: 14,
-    color: colors.text_gray,
-    marginRight: 4,
+    fontFamily: fontFamily.medium,
+    fontSize: fontSize.label,
+    color: palette.ink_muted,
   },
   categoryTabTextSelected: {
-    color: colors.text_primary,
+    fontFamily: fontFamily.semiBold,
+    color: palette.shell,
   },
   categoryCount: {
-    fontFamily: typography.regular,
-    fontSize: 12,
-    color: colors.text_gray,
+    fontFamily: fontFamily.regular,
+    fontSize: fontSize.caption,
+    color: palette.ink_faint,
   },
   categoryCountSelected: {
-    color: colors.text_primary,
+    color: palette.shell,
+  },
+  gridItem: {
+    flex: 1 / 3,
+    aspectRatio: 1,
+  },
+  gridItemFill: {
+    flex: 1,
   },
   gridContent: {
-    paddingTop: 6,
+    paddingTop: spacing.sm,
     paddingHorizontal: 10,
+    paddingBottom: spacing.xxl,
   },
   gridContentWithDelete: {
     paddingBottom: 80,

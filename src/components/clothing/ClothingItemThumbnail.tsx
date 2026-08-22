@@ -1,5 +1,5 @@
 import React from "react";
-import { Image, StyleSheet, View } from "react-native";
+import { Image, StyleSheet, View, StyleProp, ViewStyle } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { ClothingItem } from "../../types/ClothingItem";
 import { colors } from "../../styles/colors";
@@ -11,11 +11,13 @@ type Props = {
   onLongPress?: () => void;
   isSelectable?: boolean;
   isSelected?: boolean;
+  // Overrides the default 1/3-width grid cell, for callers that size it themselves
+  containerStyle?: StyleProp<ViewStyle>;
 };
 
-const ClothingItemThumbnail = ({ item, onPress, onLongPress, isSelectable, isSelected }: Props) => (
+const ClothingItemThumbnail = ({ item, onPress, onLongPress, isSelectable, isSelected, containerStyle }: Props) => (
   <PressableFade
-    containerStyle={styles.container}
+    containerStyle={[styles.container, containerStyle]}
     style={styles.pressableContent}
     onPress={onPress}
     onLongPress={onLongPress}

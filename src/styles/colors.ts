@@ -1,26 +1,30 @@
+import { palette } from "./theme";
+
+// Semantic aliases kept so existing screens pick up the palette without edits.
+// New code should import from ./theme directly.
 export const colors = {
-  primary_yellow: "#F4C753",
-  light_yellow: "#FFE9B1",
-  text_primary: "#1E1E1E",
-  text_gray: "#625845",
-  text_gray_light: "#A39E9E",
+  primary_yellow: palette.rose,
+  light_yellow: palette.rose_soft,
+  text_primary: palette.ink,
+  text_gray: palette.ink_muted,
+  text_gray_light: palette.ink_faint,
 
-  icon_stroke: "#1E1E1E",
-  screen_background: "#FCFAF7",
-  thumbnail_background: "#F2F0E8",
+  icon_stroke: palette.ink,
+  screen_background: palette.cream,
+  thumbnail_background: palette.blush,
 
-  background_dim: "rgba(0, 0, 0, 0.25)",
+  background_dim: palette.scrim,
 
-  tag_dark: "#2C2C2C",
-  tag_dark_disabled: "#4C4C4C",
-  tag_light: "#F5F5F5",
-  tag_dark_text: "#F5F5F5",
-  tag_dark_text_disabled: "#BDBDBD",
-  tag_light_text: "#757575",
+  tag_dark: palette.ink,
+  tag_dark_disabled: palette.ink_muted,
+  tag_light: palette.blush,
+  tag_dark_text: palette.cream,
+  tag_dark_text_disabled: palette.ink_faint,
+  tag_light_text: palette.ink_muted,
 
-  divider_light: "#DDDDDD",
-  border_gray: "#D3D3D3",
-  border_gray_light: "#E0E0E0",
+  divider_light: palette.line,
+  border_gray: palette.line_strong,
+  border_gray_light: palette.line,
 
-  primary_red: "#FF2000",
+  primary_red: palette.danger,
 };
