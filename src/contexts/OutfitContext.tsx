@@ -1,6 +1,7 @@
 import React, { createContext, useState, useEffect, ReactNode, useMemo, useCallback } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Outfit, OutfitItem } from "../types/Outfit";
+import { deleteImage } from "../utils/ImageUtils";
 
 type TagData = {
   tag: string;
@@ -128,9 +129,17 @@ export const OutfitProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     );
   }, []);
 
-  const deleteOutfit = useCallback((id: string) => {
-    setOutfits((prev) => prev.filter((outfit) => outfit.id !== id));
-  }, []);
+  const deleteOutfit = useCallback(
+    (id: string) => {
+      const outfit = outfits.find((o) => o.id === id);
+      setOutfits((prev) => prev.filter((o) => o.id !== id));
+
+      if (outfit) {
+        deleteImage(outfit.imageUri);
+      }
+    },
+    [outfits]
+  );
 
   // Helper function to get max zIndex for an outfit
   const getMaxZIndex = useCallback(

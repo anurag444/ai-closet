@@ -2,7 +2,7 @@ import React, { useState, useContext, useEffect, useRef } from "react";
 import { View, Text, StyleSheet, Alert } from "react-native";
 import { SafeAreaView, Edge } from "react-native-safe-area-context";
 import { MaterialIcons } from "@expo/vector-icons";
-import ViewShot, { CaptureOptions } from "react-native-view-shot";
+import ViewShot from "react-native-view-shot";
 import { OutfitStackScreenProps } from "../types/navigation";
 import { colors } from "../styles/colors";
 import { typography } from "../styles/globalStyles";
@@ -13,6 +13,7 @@ import { OutfitContext } from "../contexts/OutfitContext";
 import { ClothingItem } from "../types/ClothingItem";
 import { Outfit, OutfitItem } from "../types/Outfit";
 import PressableFade from "../components/common/PressableFade";
+import { persistImage, deleteImage } from "../utils/ImageUtils";
 import { v4 as uuidv4 } from "uuid";
 
 const ITEM_SIZE = 150;
@@ -20,7 +21,7 @@ const ITEM_SIZE = 150;
 type Props = OutfitStackScreenProps<"OutfitCanvas">;
 
 type ViewShotRef = {
-  capture: (options?: CaptureOptions) => Promise<string>;
+  capture: () => Promise<string>;
 } & ViewShot;
 
 type CanvasRef = {
@@ -95,6 +96,8 @@ const OutfitCanvasScreen = ({ navigation, route }: Props) => {
     setCanvasItems((prev) => prev.filter((_, i) => i !== index));
   };
 
+  // Returns a temp file URI. ViewShot.capture() ignores any arguments and uses the
+  // options prop on the component below, so the format is configured there.
   const captureCanvas = async (): Promise<string> => {
     if (!viewShotRef.current) {
       throw new Error("Canvas reference not found");
@@ -109,13 +112,7 @@ const OutfitCanvasScreen = ({ navigation, route }: Props) => {
       // Wait a frame to ensure background is removed
       await new Promise((resolve) => requestAnimationFrame(resolve));
 
-      const uri = await viewShotRef.current.capture({
-        format: "png",
-        quality: 1,
-        result: "base64",
-      });
-
-      return uri;
+      return await viewShotRef.current.capture();
     } catch (error) {
       console.error("Error capturing canvas:", error);
       throw error;
@@ -133,7 +130,8 @@ const OutfitCanvasScreen = ({ navigation, route }: Props) => {
 
     try {
       setIsSaving(true);
-      const outfitImageUri = await captureCanvas();
+      const capturedUri = await captureCanvas();
+      const outfitImageUri = await persistImage(capturedUri, "outfit");
 
       let outfit: Outfit;
       const now = new Date().toISOString();
@@ -153,6 +151,9 @@ const OutfitCanvasScreen = ({ navigation, route }: Props) => {
           updatedAt: now, // Update timestamp
         };
         outfitContext.updateOutfit(outfit);
+
+        // Reclaim the disk used by the image we just replaced
+        await deleteImage(existingOutfit.imageUri);
       } else {
         // Create a new outfit
         outfit = {
