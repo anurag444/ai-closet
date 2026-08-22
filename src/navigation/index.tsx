@@ -120,9 +120,11 @@ const AppNavigator = () => {
 
 const styles = StyleSheet.create({
   tabBar: {
-    height: Platform.OS === "ios" ? 90 : 64,
-    paddingBottom: Platform.OS === "ios" ? 32 : spacing.md,
-    paddingTop: spacing.md,
+    // Android needs room for a 24px icon plus the label; the old 64 with 12px
+    // padding each side left 40px for ~46px of content, which clipped the text
+    height: Platform.OS === "ios" ? 90 : 72,
+    paddingBottom: Platform.OS === "ios" ? 32 : spacing.sm,
+    paddingTop: spacing.sm,
     backgroundColor: palette.shell,
     borderTopColor: palette.line,
     borderTopWidth: 1,
@@ -131,10 +133,11 @@ const styles = StyleSheet.create({
   tabBarLabel: {
     fontFamily: fontFamily.medium,
     fontSize: fontSize.caption,
-    marginTop: spacing.xs,
+    marginTop: 2,
+    marginBottom: 0,
   },
   tabBarIcon: {
-    marginTop: spacing.xs,
+    marginTop: 0,
   },
 });
 
