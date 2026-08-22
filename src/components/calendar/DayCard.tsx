@@ -5,6 +5,7 @@ import { Outfit } from "../../types/Outfit";
 import { colors } from "../../styles/colors";
 import { typography } from "../../styles/globalStyles";
 import OutfitThumbnail from "../outfit/OutfitThumbnail";
+import PressableFade from "../common/PressableFade";
 import { WEEKDAY_ABBREVIATIONS, isToday } from "../../utils/dates";
 
 const THUMBNAIL_HEIGHT = 104;
@@ -13,9 +14,10 @@ const THUMBNAIL_WIDTH = (THUMBNAIL_HEIGHT * 3) / 4; // 3:4, matching the outfit 
 type Props = {
   date: Date;
   outfit?: Outfit;
+  onPress: () => void;
 };
 
-const DayCard = ({ date, outfit }: Props) => {
+const DayCard = ({ date, outfit, onPress }: Props) => {
   const isCurrentDay = isToday(date);
 
   return (
@@ -28,11 +30,11 @@ const DayCard = ({ date, outfit }: Props) => {
       </View>
 
       {outfit ? (
-        <OutfitThumbnail outfit={outfit} width={THUMBNAIL_WIDTH} height={THUMBNAIL_HEIGHT} onPress={() => {}} />
+        <OutfitThumbnail outfit={outfit} width={THUMBNAIL_WIDTH} height={THUMBNAIL_HEIGHT} onPress={onPress} />
       ) : (
-        <View style={styles.emptySlot}>
+        <PressableFade style={styles.emptySlot} onPress={onPress}>
           <MaterialIcons name="add" size={24} color={colors.text_gray_light} />
-        </View>
+        </PressableFade>
       )}
     </View>
   );

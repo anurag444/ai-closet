@@ -1,7 +1,7 @@
 # Implementation Plan — Outfit Calendar + Remaining Feature Set
 
 > **Working doc.** Update the Status table and the Decisions log as milestones land.
-> Branch: `feat/outfit-calendar`
+> Work lands on `main` at `github.com/anurag444/ai-closet`, one commit per milestone, after device verification.
 
 ## Status
 
@@ -11,14 +11,14 @@
 | M1 | Fix outfit image storage | ✅ Done, verified on device |
 | M2 | Persistence helper + context refactor | ✅ Done, verified on device |
 | M3 | Calendar model, context, empty 5th tab | ✅ Done, verified on device |
-| M4 | Week view (read-only) | ✅ Done — awaiting your device verification (uncommitted) |
-| M5 | Assign an outfit to a date | ⬜ Not started |
+| M4 | Week view (read-only) | ✅ Done, verified on device |
+| M5 | Assign an outfit to a date | ✅ Done — awaiting your device verification (uncommitted) |
 | M6 | Day actions: view / replace / remove | ⬜ Not started |
 | M7 | Month view + toggle | ⬜ Not started |
 | M8 | Profile tab | ⬜ Not started |
 | M9 | Cleanup (`FilterButton.tsx`, README) | ⬜ Not started |
 
-**Next up:** M5.
+**Next up:** M6.
 
 **Process:** nothing gets committed until Anurag has verified it on a device.
 
@@ -57,9 +57,11 @@ Target: a 5-tab app where the Plan tab opens on a week view (toggleable to month
 
 **4. Calendar is a 5th tab**, between Try-On and Profile. Week view is the default; month is a toggle.
 
+**5. The load/save effects were racing.** Each context ran its load effect and its save effect on the same mount. The save fired immediately with the initial `[]`, and because both hit the same native AsyncStorage queue, that write could land before `getItem` resolved — reading back `[]` and wiping stored data. Rare, and more likely on a cold start with a large closet, but it was real. `usePersistedState` gates the save on `isHydrated`.
+
 **6. `OutfitContext` exposes `isHydrated`.** `CalendarContext` prunes entries whose outfit was deleted, but on a cold start `outfits` is `[]` until storage resolves — so every entry would look orphaned and get wiped. Both the display filter and the prune effect are gated on outfits having actually loaded. `usePersistedState` already returned the flag; it was just being discarded.
 
-**5. The load/save effects were racing.** Each context ran its load effect and its save effect on the same mount. The save fired immediately with the initial `[]`, and because both hit the same native AsyncStorage queue, that write could land before `getItem` resolved — reading back `[]` and wiping stored data. Rare, and more likely on a cold start with a large closet, but it was real. `usePersistedState` gates the save on `isHydrated`.
+**7. Assignment goes through the context, not a navigation callback.** `SelectOutfitModal` calls `setOutfitForDate` itself and then `goBack()`. Passing an `onSelect` function through route params would put a non-serializable value into navigation state, which React Navigation warns about and which breaks state persistence.
 
 ---
 
@@ -105,7 +107,7 @@ Target: a 5-tab app where the Plan tab opens on a week view (toggleable to month
 
 **Verify:** Current week shown, today highlighted. Chevrons cross a month boundary and Dec→Jan correctly. Today jumps back.
 
-### M5 — Assign an outfit to a date
+### M5 — Assign an outfit to a date ✅
 - `src/screens/SelectOutfitModalScreen.tsx`: the grid from `OutfitManagementScreen` (same `COLUMN_COUNT`/`ITEM_WIDTH`, same `TagFilterSection` + `OutfitThumbnail`) minus selection/delete. Single tap picks.
 - `types/navigation.ts`: `SelectOutfitModal: { dateKey: string }`.
 - `navigation/index.tsx`: register in the existing `RootStack.Group` modal group.

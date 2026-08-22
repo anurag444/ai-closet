@@ -11,6 +11,7 @@ import OutfitCanvasScreen from "../screens/OutfitCanvasScreen";
 import OutfitDetailScreen from "../screens/OutfitDetailScreen";
 import VirtualTryOnScreen from "../screens/VirtualTryOnScreen";
 import OutfitPlanScreen from "../screens/OutfitPlanScreen";
+import SelectOutfitModalScreen from "../screens/SelectOutfitModalScreen";
 import { colors } from "../styles/colors";
 import { typography } from "../styles/globalStyles";
 import {
@@ -121,6 +122,7 @@ const AppNavigator = () => {
         <RootStack.Group screenOptions={{ presentation: "modal" }}>
           <RootStack.Screen name="ClothingDetailModal" component={ClothingDetailScreen} />
           <RootStack.Screen name="OutfitDetailModal" component={OutfitDetailScreen} />
+          <RootStack.Screen name="SelectOutfitModal" component={SelectOutfitModalScreen} />
         </RootStack.Group>
       </RootStack.Navigator>
     </NavigationContainer>

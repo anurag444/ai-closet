@@ -12,12 +12,17 @@ type Props = PlanStackScreenProps<"OutfitPlan">;
 
 const safeAreaEdges: Edge[] = ["top", "left", "right"];
 
-const OutfitPlanScreen = ({}: Props) => {
+const OutfitPlanScreen = ({ navigation }: Props) => {
   const [anchorDate, setAnchorDate] = useState(() => startOfDay(new Date()));
 
   const handlePrevious = useCallback(() => setAnchorDate((prev) => addWeeks(prev, -1)), []);
   const handleNext = useCallback(() => setAnchorDate((prev) => addWeeks(prev, 1)), []);
   const handleToday = useCallback(() => setAnchorDate(startOfDay(new Date())), []);
+
+  const handleSelectDate = useCallback(
+    (dateKey: string) => navigation.navigate("SelectOutfitModal", { dateKey }),
+    [navigation]
+  );
 
   const isTodayVisible = getWeekDays(anchorDate).some(isToday);
 
@@ -35,7 +40,7 @@ const OutfitPlanScreen = ({}: Props) => {
         isTodayVisible={isTodayVisible}
       />
 
-      <WeekView anchorDate={anchorDate} />
+      <WeekView anchorDate={anchorDate} onSelectDate={handleSelectDate} />
     </SafeAreaView>
   );
 };

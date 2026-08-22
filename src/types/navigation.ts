@@ -6,7 +6,7 @@ export type RootStackParamList = {
   MainTabs: NavigatorScreenParams<MainTabParamList>;
   ClothingDetailModal: { id: string };
   OutfitDetailModal: { id: string };
-  SelectOutfitModal: undefined;
+  SelectOutfitModal: { dateKey: string };
 };
 
 export type MainTabParamList = {
