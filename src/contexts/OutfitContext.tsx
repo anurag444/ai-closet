@@ -16,6 +16,7 @@ type OutfitContextType = {
   // Data
   outfits: Outfit[];
   tagData: TagData;
+  isHydrated: boolean; // false until outfits have been read back from storage
 
   // Filtering
   activeFilters: OutfitFilters;
@@ -36,7 +37,7 @@ type OutfitContextType = {
 export const OutfitContext = createContext<OutfitContextType | null>(null);
 
 export const OutfitProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [outfits, setOutfits] = usePersistedState<Outfit[]>(STORAGE_KEYS.outfits, []);
+  const [outfits, setOutfits, isHydrated] = usePersistedState<Outfit[]>(STORAGE_KEYS.outfits, []);
   const [activeFilters, setActiveFilters] = useState<OutfitFilters>({
     tags: [],
   });
@@ -128,6 +129,7 @@ export const OutfitProvider: React.FC<{ children: ReactNode }> = ({ children }) 
   const contextValue = {
     outfits,
     tagData,
+    isHydrated,
     activeFilters,
     filteredOutfits,
     setFilter,

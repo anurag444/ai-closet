@@ -9,8 +9,8 @@
 |---|-----------|-------|
 | M0 | Try-on credentials (`EXPO_PUBLIC_KWAI_*`) | ⬜ Not started — needs Kling AI keys from you |
 | M1 | Fix outfit image storage | ✅ Done, verified on device |
-| M2 | Persistence helper + context refactor | ✅ Done — awaiting your device verification |
-| M3 | Calendar model, context, empty 5th tab | ⬜ Not started |
+| M2 | Persistence helper + context refactor | ✅ Done, verified on device |
+| M3 | Calendar model, context, empty 5th tab | ✅ Done — awaiting your device verification (uncommitted) |
 | M4 | Week view (read-only) | ⬜ Not started |
 | M5 | Assign an outfit to a date | ⬜ Not started |
 | M6 | Day actions: view / replace / remove | ⬜ Not started |
@@ -18,7 +18,9 @@
 | M8 | Profile tab | ⬜ Not started |
 | M9 | Cleanup (`FilterButton.tsx`, README) | ⬜ Not started |
 
-**Next up:** M3.
+**Next up:** M4.
+
+**Process:** nothing gets committed until Anurag has verified it on a device.
 
 **Open item:** outfits saved before M1 have unrecoverable thumbnails (see Decisions #2). Fix by opening each → Edit → Save, or ask for a one-time cleanup pass.
 
@@ -55,6 +57,8 @@ Target: a 5-tab app where the Plan tab opens on a week view (toggleable to month
 
 **4. Calendar is a 5th tab**, between Try-On and Profile. Week view is the default; month is a toggle.
 
+**6. `OutfitContext` exposes `isHydrated`.** `CalendarContext` prunes entries whose outfit was deleted, but on a cold start `outfits` is `[]` until storage resolves — so every entry would look orphaned and get wiped. Both the display filter and the prune effect are gated on outfits having actually loaded. `usePersistedState` already returned the flag; it was just being discarded.
+
 **5. The load/save effects were racing.** Each context ran its load effect and its save effect on the same mount. The save fired immediately with the initial `[]`, and because both hit the same native AsyncStorage queue, that write could land before `getItem` resolved — reading back `[]` and wiping stored data. Rare, and more likely on a cold start with a large closet, but it was real. `usePersistedState` gates the save on `isHydrated`.
 
 ---
@@ -82,7 +86,7 @@ Target: a 5-tab app where the Plan tab opens on a week view (toggleable to month
 
 **Verify:** Relaunch — clothing, outfits, try-on history all load. Add one of each, force-quit, relaunch, both present.
 
-### M3 — Calendar model, context, empty 5th tab
+### M3 — Calendar model, context, empty 5th tab ✅
 - `src/types/CalendarEntry.ts`: `{ id, date /* 'YYYY-MM-DD' local */, outfitId, createdAt, updatedAt }`.
 - `src/utils/dates.ts` (~50 lines, no dependency): `toDateKey`, `fromDateKey`, `startOfWeek` (Sunday), `addDays`, `addWeeks`, `addMonths`, `getWeekDays`, `getMonthGrid(year, month)` (6×7 padded), `isToday`. Lift the `months` / `monthAbbreviations` arrays out of `components/common/YearMonthPicker.tsx:38` and import them back there.
 - `src/contexts/CalendarContext.tsx`, shaped like `OutfitContext`: `entries` under `@calendar_entries`; memoized `entriesByDate` that filters out entries whose outfit was deleted (reads `OutfitContext`, so it must nest **inside** `OutfitProvider`); `getEntryForDate`, `setOutfitForDate`, `removeEntryForDate`; a prune effect for orphans.

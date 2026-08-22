@@ -10,6 +10,7 @@ import AppNavigator from "./src/navigation";
 import { ClothingProvider } from "./src/contexts/ClothingContext";
 import { VirtualTryOnProvider } from "./src/contexts/VirtualTryOnContext";
 import { OutfitProvider } from "./src/contexts/OutfitContext";
+import { CalendarProvider } from "./src/contexts/CalendarContext";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { StyleSheet } from "react-native";
 
@@ -29,9 +30,11 @@ export default function App() {
     <GestureHandlerRootView style={styles.container}>
       <ClothingProvider>
         <OutfitProvider>
-          <VirtualTryOnProvider>
-            <AppNavigator />
-          </VirtualTryOnProvider>
+          <CalendarProvider>
+            <VirtualTryOnProvider>
+              <AppNavigator />
+            </VirtualTryOnProvider>
+          </CalendarProvider>
         </OutfitProvider>
       </ClothingProvider>
     </GestureHandlerRootView>

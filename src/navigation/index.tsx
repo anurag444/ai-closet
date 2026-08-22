@@ -10,6 +10,7 @@ import OutfitManagementScreen from "../screens/OutfitManagementScreen";
 import OutfitCanvasScreen from "../screens/OutfitCanvasScreen";
 import OutfitDetailScreen from "../screens/OutfitDetailScreen";
 import VirtualTryOnScreen from "../screens/VirtualTryOnScreen";
+import OutfitPlanScreen from "../screens/OutfitPlanScreen";
 import { colors } from "../styles/colors";
 import { typography } from "../styles/globalStyles";
 import {
@@ -18,6 +19,7 @@ import {
   ClosetStackParamList,
   OutfitStackParamList,
   TryOnStackParamList,
+  PlanStackParamList,
 } from "../types/navigation";
 
 const RootStack = createNativeStackNavigator<RootStackParamList>();
@@ -25,6 +27,7 @@ const Tab = createBottomTabNavigator<MainTabParamList>();
 const ClosetStack = createNativeStackNavigator<ClosetStackParamList>();
 const OutfitStack = createNativeStackNavigator<OutfitStackParamList>();
 const TryOnStack = createNativeStackNavigator<TryOnStackParamList>();
+const PlanStack = createNativeStackNavigator<PlanStackParamList>();
 
 const ProfileScreen = () => <></>;
 
@@ -48,6 +51,12 @@ const TryOnStackNavigator = () => (
   <TryOnStack.Navigator screenOptions={{ headerShown: false }}>
     <TryOnStack.Screen name="VirtualTryOn" component={VirtualTryOnScreen} />
   </TryOnStack.Navigator>
+);
+
+const PlanStackNavigator = () => (
+  <PlanStack.Navigator screenOptions={{ headerShown: false }}>
+    <PlanStack.Screen name="OutfitPlan" component={OutfitPlanScreen} />
+  </PlanStack.Navigator>
 );
 
 // Main Tab Navigator
@@ -82,6 +91,15 @@ const MainTabNavigator = () => (
       options={{
         tabBarLabel: "Try-On",
         tabBarIcon: ({ color, size }) => <FontAwesome6 name="wand-magic-sparkles" size={20} color={color} />,
+      }}
+    />
+    <Tab.Screen
+      name="Plan"
+      component={PlanStackNavigator}
+      options={{
+        tabBarIcon: ({ color, size }) => (
+          <MaterialCommunityIcons name="calendar-month-outline" size={size} color={color} />
+        ),
       }}
     />
     <Tab.Screen

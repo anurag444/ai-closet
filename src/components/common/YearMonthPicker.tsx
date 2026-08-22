@@ -4,6 +4,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { colors } from "../../styles/colors";
 import { typography } from "../../styles/globalStyles";
 import PressableFade from "./PressableFade";
+import { MONTH_NAMES as months, MONTH_ABBREVIATIONS as monthAbbreviations } from "../../utils/dates";
 
 const MODAL = {
   HEADER_HEIGHT: 56,
@@ -35,23 +36,6 @@ type Props = {
   onValueChange: (date: string) => void;
   disabled?: boolean;
 };
-
-const months = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December",
-];
-
-const monthAbbreviations = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
 const YearMonthPicker = ({ selectedDate, onValueChange, disabled = false }: Props) => {
   const [isModalVisible, setModalVisible] = useState(false);
