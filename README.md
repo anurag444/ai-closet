@@ -80,6 +80,21 @@ The app is built with **React Native** and **Expo**, offering a cross-platform s
   </tr>
 </table>
 
+<br />
+
+<table max-height="400px">
+  <tr>
+    <td>
+      <strong>Plan Outfits on a Calendar</strong><br />
+      <ul>
+        <li>Assign a saved outfit to any date, and swap or clear it whenever plans change.</li>
+        <li>Switch between a week view and a month view without losing your place.</li>
+        <li>Deleting an outfit clears it from every day it was planned for.</li>
+      </ul>
+    </td>
+  </tr>
+</table>
+
 
 ---
 
@@ -156,7 +171,6 @@ Refer to the [design_doc](/design_doc.md) for more details on the current archit
 - **Batch Clothing Upload**: Add multiple clothing items at once for faster initial closet setup.
 - **Social Sharing & Export**: Easily share outfits to social media or with friends.
 - **User Onboarding Screens**: Introduce new users to the app and its features.
-- **Outfit Calendar**: Track daily outfits and look back at past styles.
 - **Closet Analytics**: Gather insights like items per category, color distribution, etc.
 - **Multi-item Try-On Options**: Support multi-item try-on such as full outfits or multiple items at once.
 - **Credit-Based Premium Features**: Implement a system that allows users to purchase credits for expensive AI functionalities (mainly virtual try-ons or large-scale operations).

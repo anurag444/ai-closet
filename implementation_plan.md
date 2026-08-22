@@ -15,10 +15,10 @@
 | M5 | Assign an outfit to a date | ✅ Done, verified on device |
 | M6 | Day actions: view / replace / remove | ✅ Done, verified on device |
 | M7 | Month view + toggle | ✅ Done, verified on device |
-| M8 | Profile tab | ✅ Done — awaiting your device verification (uncommitted) |
-| M9 | Cleanup (`FilterButton.tsx`, README) | ⬜ Not started |
+| M8 | Profile tab | ✅ Done, verified on device |
+| M9 | Cleanup (`FilterButton.tsx`, README) | ✅ Done — awaiting your device verification (uncommitted) |
 
-**Next up:** M9.
+**Next up:** M0 (try-on credentials) is all that remains, and it needs Kling AI keys from you.
 
 **Process:** nothing gets committed until Anurag has verified it on a device.
 
@@ -136,8 +136,9 @@ Target: a 5-tab app where the Plan tab opens on a week view (toggleable to month
 
 **Verify:** Counts match the other tabs. Clear-history empties Recently Tried.
 
-### M9 — Cleanup
-- Delete `src/components/common/FilterButton.tsx` — 0 bytes, no importers; `TagFilterSection` and `CategoryPicker` already cover filtering.
+### M9 — Cleanup ✅
+- Deleted `src/components/common/FilterButton.tsx` — 0 bytes, no importers; `TagFilterSection` and `CategoryPicker` already cover filtering. No zero-byte files remain in `src/`.
+- `dates.ts` exports `addDays`, `startOfWeek`, `isSameDay` and `AsyncStorage.ts` exports `loadJSON`, `saveJSON` that are currently only used inside their own modules. Left exported as the natural surface of a utility module rather than churned; flagged here so the choice is visible.
 - `README.md`: move "Outfit Calendar" out of Future Features.
 
 **Verify:** `npx tsc --noEmit` clean; all five tabs exercised end to end.
