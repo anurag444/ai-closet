@@ -1,6 +1,6 @@
-import React, { createContext, useState, useEffect, ReactNode, useMemo, useCallback } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import React, { createContext, useState, ReactNode, useMemo, useCallback } from "react";
 import { v4 as uuidv4 } from "uuid";
+import { usePersistedState, STORAGE_KEYS } from "../utils/AsyncStorage";
 import { ClothingItem, createNewClothingItem } from "../types/ClothingItem";
 import { categories } from "../data/categories";
 import { removeBackground } from "../services/BackgroundRemoval";
@@ -55,38 +55,11 @@ export const ClothingContext = createContext<ClothingContextType | null>(null);
 
 export const ClothingProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   // State
-  const [clothingItems, setClothingItems] = useState<ClothingItem[]>([]);
+  const [clothingItems, setClothingItems] = usePersistedState<ClothingItem[]>(STORAGE_KEYS.clothingItems, []);
   const [activeFilters, setActiveFilters] = useState<ClothingFilters>({
     category: "All",
     tags: [],
   });
-
-  // Load clothing items from AsyncStorage on mount
-  useEffect(() => {
-    const loadClothingItems = async () => {
-      try {
-        const jsonValue = await AsyncStorage.getItem("@clothing_items");
-        if (jsonValue != null) {
-          setClothingItems(JSON.parse(jsonValue));
-        }
-      } catch (e) {
-        console.error("Error loading clothing items:", e);
-      }
-    };
-    loadClothingItems();
-  }, []);
-
-  // Save clothing items to AsyncStorage whenever they change
-  useEffect(() => {
-    const saveClothingItems = async () => {
-      try {
-        await AsyncStorage.setItem("@clothing_items", JSON.stringify(clothingItems));
-      } catch (e) {
-        console.error("Error saving clothing items:", e);
-      }
-    };
-    saveClothingItems();
-  }, [clothingItems]);
 
   // Memoized category counts
   const categoryData = useMemo(() => {

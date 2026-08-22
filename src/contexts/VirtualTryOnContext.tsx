@@ -1,7 +1,7 @@
-import React, { createContext, useState, useEffect, ReactNode } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import React, { createContext, ReactNode } from "react";
 import { VirtualTryOnItem } from "../types/VirtualTryOn";
 import { v4 as uuidv4 } from "uuid";
+import { usePersistedState, STORAGE_KEYS } from "../utils/AsyncStorage";
 
 type VirtualTryOnContextType = {
   recentTryOns: VirtualTryOnItem[];
@@ -13,34 +13,7 @@ type VirtualTryOnContextType = {
 export const VirtualTryOnContext = createContext<VirtualTryOnContextType | null>(null);
 
 export const VirtualTryOnProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [recentTryOns, setRecentTryOns] = useState<VirtualTryOnItem[]>([]);
-
-  // Load try-on history from AsyncStorage on mount
-  useEffect(() => {
-    const loadTryOns = async () => {
-      try {
-        const jsonValue = await AsyncStorage.getItem("@try_on_history");
-        if (jsonValue != null) {
-          setRecentTryOns(JSON.parse(jsonValue));
-        }
-      } catch (e) {
-        console.error("Error loading try-on history:", e);
-      }
-    };
-    loadTryOns();
-  }, []);
-
-  // Save try-ons to AsyncStorage whenever they change
-  useEffect(() => {
-    const saveTryOns = async () => {
-      try {
-        await AsyncStorage.setItem("@try_on_history", JSON.stringify(recentTryOns));
-      } catch (e) {
-        console.error("Error saving try-on history:", e);
-      }
-    };
-    saveTryOns();
-  }, [recentTryOns]);
+  const [recentTryOns, setRecentTryOns] = usePersistedState<VirtualTryOnItem[]>(STORAGE_KEYS.tryOnHistory, []);
 
   const addTryOn = async (tryOn: Omit<VirtualTryOnItem, "id" | "createdAt" | "updatedAt">) => {
     const now = new Date().toISOString();
@@ -55,12 +28,8 @@ export const VirtualTryOnProvider: React.FC<{ children: ReactNode }> = ({ childr
   };
 
   const clearHistory = async () => {
-    try {
-      await AsyncStorage.removeItem("@try_on_history");
-      setRecentTryOns([]);
-    } catch (e) {
-      console.error("Error clearing try-on history:", e);
-    }
+    // The persisted state writes the empty list through to storage
+    setRecentTryOns([]);
   };
 
   // New method to delete specific items

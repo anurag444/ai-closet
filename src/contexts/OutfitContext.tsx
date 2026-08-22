@@ -1,7 +1,7 @@
-import React, { createContext, useState, useEffect, ReactNode, useMemo, useCallback } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import React, { createContext, useState, ReactNode, useMemo, useCallback } from "react";
 import { Outfit, OutfitItem } from "../types/Outfit";
 import { deleteImage } from "../utils/ImageUtils";
+import { usePersistedState, STORAGE_KEYS } from "../utils/AsyncStorage";
 
 type TagData = {
   tag: string;
@@ -36,37 +36,10 @@ type OutfitContextType = {
 export const OutfitContext = createContext<OutfitContextType | null>(null);
 
 export const OutfitProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [outfits, setOutfits] = useState<Outfit[]>([]);
+  const [outfits, setOutfits] = usePersistedState<Outfit[]>(STORAGE_KEYS.outfits, []);
   const [activeFilters, setActiveFilters] = useState<OutfitFilters>({
     tags: [],
   });
-
-  // Load outfits from AsyncStorage on mount
-  useEffect(() => {
-    const loadOutfits = async () => {
-      try {
-        const jsonValue = await AsyncStorage.getItem("@outfits");
-        if (jsonValue != null) {
-          setOutfits(JSON.parse(jsonValue));
-        }
-      } catch (e) {
-        console.error("Error loading outfits:", e);
-      }
-    };
-    loadOutfits();
-  }, []);
-
-  // Save outfits to AsyncStorage whenever they change
-  useEffect(() => {
-    const saveOutfits = async () => {
-      try {
-        await AsyncStorage.setItem("@outfits", JSON.stringify(outfits));
-      } catch (e) {
-        console.error("Error saving outfits:", e);
-      }
-    };
-    saveOutfits();
-  }, [outfits]);
 
   // Memoized tag frequency data
   const tagData = useMemo(() => {

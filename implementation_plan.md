@@ -8,8 +8,8 @@
 | # | Milestone | State |
 |---|-----------|-------|
 | M0 | Try-on credentials (`EXPO_PUBLIC_KWAI_*`) | ⬜ Not started — needs Kling AI keys from you |
-| M1 | Fix outfit image storage | ✅ Done — awaiting your device verification |
-| M2 | Persistence helper + context refactor | ⬜ Not started |
+| M1 | Fix outfit image storage | ✅ Done, verified on device |
+| M2 | Persistence helper + context refactor | ✅ Done — awaiting your device verification |
 | M3 | Calendar model, context, empty 5th tab | ⬜ Not started |
 | M4 | Week view (read-only) | ⬜ Not started |
 | M5 | Assign an outfit to a date | ⬜ Not started |
@@ -18,9 +18,9 @@
 | M8 | Profile tab | ⬜ Not started |
 | M9 | Cleanup (`FilterButton.tsx`, README) | ⬜ Not started |
 
-**Next up:** M2.
+**Next up:** M3.
 
-**Open item carried into M2:** outfits saved before M1 have unrecoverable thumbnails (see Decisions #2). Fix by opening each → Edit → Save, or ask for a one-time cleanup pass.
+**Open item:** outfits saved before M1 have unrecoverable thumbnails (see Decisions #2). Fix by opening each → Edit → Save, or ask for a one-time cleanup pass.
 
 ---
 
@@ -55,6 +55,8 @@ Target: a 5-tab app where the Plan tab opens on a week view (toggleable to month
 
 **4. Calendar is a 5th tab**, between Try-On and Profile. Week view is the default; month is a toggle.
 
+**5. The load/save effects were racing.** Each context ran its load effect and its save effect on the same mount. The save fired immediately with the initial `[]`, and because both hit the same native AsyncStorage queue, that write could land before `getItem` resolved — reading back `[]` and wiping stored data. Rare, and more likely on a cold start with a large closet, but it was real. `usePersistedState` gates the save on `isHydrated`.
+
 ---
 
 ## Milestones
@@ -72,10 +74,11 @@ Target: a 5-tab app where the Plan tab opens on a week view (toggleable to month
 
 **Verify:** Save a new outfit → thumbnail renders in the grid *and* on the detail screen → force-quit and relaunch → still there. Edit + re-save updates it.
 
-### M2 — Persistence helper + context refactor
-- Fill `src/utils/AsyncStorage.ts` (~50 lines): `loadJSON<T>`, `saveJSON<T>`, `usePersistedState<T>(key, initial) → [value, setValue, isHydrated]`, and a `STORAGE_KEYS` const.
-- The `isHydrated` flag matters: all three contexts currently fire their save effect with `[]` on first render, which can clobber stored data on a slow read. Guard the save on it.
-- Refactor `ClothingContext`, `OutfitContext`, `VirtualTryOnContext` onto it. Behavior-identical.
+### M2 — Persistence helper + context refactor ✅
+- `src/utils/AsyncStorage.ts` (was empty): `STORAGE_KEYS`, `loadJSON<T>`, `saveJSON<T>`, `usePersistedState<T>(key, initial) → [value, setValue, isHydrated]`.
+- The `isHydrated` flag fixes a real race (see Decisions #5), not just tidiness.
+- All three contexts refactored onto it; ~25 lines of duplicated load/save effect removed from each. `AsyncStorage` is now imported in exactly one file.
+- `VirtualTryOnContext.clearHistory` no longer calls `removeItem` — setting `[]` persists through the hook.
 
 **Verify:** Relaunch — clothing, outfits, try-on history all load. Add one of each, force-quit, relaunch, both present.
 
