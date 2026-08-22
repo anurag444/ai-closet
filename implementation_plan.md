@@ -10,15 +10,15 @@
 | M0 | Try-on credentials (`EXPO_PUBLIC_KWAI_*`) | ⬜ Not started — needs Kling AI keys from you |
 | M1 | Fix outfit image storage | ✅ Done, verified on device |
 | M2 | Persistence helper + context refactor | ✅ Done, verified on device |
-| M3 | Calendar model, context, empty 5th tab | ✅ Done — awaiting your device verification (uncommitted) |
-| M4 | Week view (read-only) | ⬜ Not started |
+| M3 | Calendar model, context, empty 5th tab | ✅ Done, verified on device |
+| M4 | Week view (read-only) | ✅ Done — awaiting your device verification (uncommitted) |
 | M5 | Assign an outfit to a date | ⬜ Not started |
 | M6 | Day actions: view / replace / remove | ⬜ Not started |
 | M7 | Month view + toggle | ⬜ Not started |
 | M8 | Profile tab | ⬜ Not started |
 | M9 | Cleanup (`FilterButton.tsx`, README) | ⬜ Not started |
 
-**Next up:** M4.
+**Next up:** M5.
 
 **Process:** nothing gets committed until Anurag has verified it on a device.
 
@@ -97,9 +97,11 @@ Target: a 5-tab app where the Plan tab opens on a week view (toggleable to month
 
 **Verify:** Five tabs, all legible at phone width. Plan tab opens without crashing. Other four unaffected.
 
-### M4 — Week view (read-only)
-- New `src/components/calendar/`: `WeekHeader.tsx` (month/year label, chevrons, Today button, week/month toggle — inert this milestone), `DayCard.tsx` (weekday abbr + day number + `OutfitThumbnail` or an empty dashed "+" slot; today accented with `colors.primary_yellow`), `WeekView.tsx` (7 `DayCard`s; prefer vertical rows so thumbnails get real size).
+### M4 — Week view (read-only) ✅
+- New `src/components/calendar/`: `WeekHeader.tsx` (month/year label, chevrons, Today button), `DayCard.tsx` (weekday abbr + day number + `OutfitThumbnail` or an empty dashed "+" slot; today gets a `light_yellow` row), `WeekView.tsx` (7 stacked `DayCard` rows).
 - `OutfitPlanScreen` owns `anchorDate`, wires chevrons through `addWeeks`.
+- **Deviation from plan:** the week/month toggle was left out rather than shipped inert — dead controls are worse to test than absent ones. It arrives in M7 with `MonthView`.
+- The Today button hides itself when the current week is already on screen.
 
 **Verify:** Current week shown, today highlighted. Chevrons cross a month boundary and Dec→Jan correctly. Today jumps back.
 

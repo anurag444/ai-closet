@@ -1,38 +1,41 @@
-import React, { useContext } from "react";
+import React, { useState, useCallback } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { SafeAreaView, Edge } from "react-native-safe-area-context";
 import { colors } from "../styles/colors";
 import { typography } from "../styles/globalStyles";
-import { CalendarContext } from "../contexts/CalendarContext";
+import WeekHeader from "../components/calendar/WeekHeader";
+import WeekView from "../components/calendar/WeekView";
 import { PlanStackScreenProps } from "../types/navigation";
-import { toDateKey } from "../utils/dates";
+import { addWeeks, getWeekDays, isToday, startOfDay } from "../utils/dates";
 
 type Props = PlanStackScreenProps<"OutfitPlan">;
 
 const safeAreaEdges: Edge[] = ["top", "left", "right"];
 
 const OutfitPlanScreen = ({}: Props) => {
-  const calendarContext = useContext(CalendarContext);
+  const [anchorDate, setAnchorDate] = useState(() => startOfDay(new Date()));
 
-  if (!calendarContext) {
-    return <Text>Loading...</Text>;
-  }
+  const handlePrevious = useCallback(() => setAnchorDate((prev) => addWeeks(prev, -1)), []);
+  const handleNext = useCallback(() => setAnchorDate((prev) => addWeeks(prev, 1)), []);
+  const handleToday = useCallback(() => setAnchorDate(startOfDay(new Date())), []);
 
-  const { entries } = calendarContext;
+  const isTodayVisible = getWeekDays(anchorDate).some(isToday);
 
   return (
     <SafeAreaView style={styles.container} edges={safeAreaEdges}>
-      <View style={styles.header}>
+      <View style={styles.titleRow}>
         <Text style={styles.title}>Plan</Text>
       </View>
 
-      {/* Placeholder until the week view lands */}
-      <View style={styles.content}>
-        <Text style={styles.placeholder}>Today is {toDateKey(new Date())}</Text>
-        <Text style={styles.placeholder}>
-          {entries.length} outfit{entries.length === 1 ? "" : "s"} planned
-        </Text>
-      </View>
+      <WeekHeader
+        anchorDate={anchorDate}
+        onPrevious={handlePrevious}
+        onNext={handleNext}
+        onToday={handleToday}
+        isTodayVisible={isTodayVisible}
+      />
+
+      <WeekView anchorDate={anchorDate} />
     </SafeAreaView>
   );
 };
@@ -42,25 +45,15 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.screen_background,
   },
-  header: {
+  titleRow: {
     paddingHorizontal: 16,
-    paddingVertical: 16,
+    paddingTop: 16,
+    paddingBottom: 12,
   },
   title: {
     fontSize: 24,
     fontFamily: typography.bold,
     color: colors.text_primary,
-  },
-  content: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 8,
-  },
-  placeholder: {
-    fontFamily: typography.regular,
-    fontSize: 16,
-    color: colors.text_gray,
   },
 });
 
