@@ -1,5 +1,7 @@
 import "react-native-get-random-values";
+import { useEffect, useState } from "react";
 import { useFonts } from "expo-font";
+import * as SplashScreen from "expo-splash-screen";
 import {
   PlusJakartaSans_400Regular,
   PlusJakartaSans_500Medium,
@@ -12,10 +14,17 @@ import { ClothingProvider } from "./src/contexts/ClothingContext";
 import { VirtualTryOnProvider } from "./src/contexts/VirtualTryOnContext";
 import { OutfitProvider } from "./src/contexts/OutfitContext";
 import { CalendarProvider } from "./src/contexts/CalendarContext";
+import AnimatedSplash from "./src/components/common/AnimatedSplash";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { StyleSheet } from "react-native";
 
+// Hold the native splash until the fonts are ready, so the animated one can
+// take over without a flash of unstyled screen
+SplashScreen.preventAutoHideAsync();
+
 export default function App() {
+  const [isSplashDone, setIsSplashDone] = useState(false);
+
   const [fontsLoaded] = useFonts({
     "PlusJakartaSans-Regular": PlusJakartaSans_400Regular,
     "PlusJakartaSans-Medium": PlusJakartaSans_500Medium,
@@ -24,6 +33,12 @@ export default function App() {
     "PlayfairDisplay-Medium": PlayfairDisplay_500Medium,
     "PlayfairDisplay-Bold": PlayfairDisplay_700Bold,
   });
+
+  useEffect(() => {
+    if (fontsLoaded) {
+      SplashScreen.hideAsync();
+    }
+  }, [fontsLoaded]);
 
   if (!fontsLoaded) {
     return null;
@@ -40,6 +55,8 @@ export default function App() {
           </CalendarProvider>
         </OutfitProvider>
       </ClothingProvider>
+
+      {!isSplashDone && <AnimatedSplash onFinish={() => setIsSplashDone(true)} />}
     </GestureHandlerRootView>
   );
 }
