@@ -1,5 +1,5 @@
 import React, { useContext, useState, useEffect } from "react";
-import { View, Text, Image, StyleSheet, ScrollView, Alert } from "react-native";
+import { View, Text, StyleSheet, ScrollView, Alert } from "react-native";
 import { SafeAreaView, Edge } from "react-native-safe-area-context";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { OutfitContext } from "../contexts/OutfitContext";
@@ -21,6 +21,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import ClothingItemThumbnail from "../components/clothing/ClothingItemThumbnail";
 import { ClothingContext } from "../contexts/ClothingContext";
 import PressableFade from "../components/common/PressableFade";
+import OutfitPreview from "../components/outfit/OutfitPreview";
 
 type Props = OutfitStackScreenProps<"OutfitDetail"> | RootStackScreenProps<"OutfitDetailModal">;
 
@@ -44,6 +45,7 @@ const OutfitDetailScreen = ({ route, navigation }: Props) => {
   // Manage local state for the form
   const [localOutfit, setLocalOutfit] = useState<Outfit | undefined>(contextOutfit);
   const [isDirty, setIsDirty] = useState(false);
+  const [previewSize, setPreviewSize] = useState({ width: 0, height: 0 });
 
   // Update local state when context outfit changes
   useEffect(() => {
@@ -136,8 +138,13 @@ const OutfitDetailScreen = ({ route, navigation }: Props) => {
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* Main outfit image section */}
-        <View style={styles.imageContainer}>
-          <Image source={{ uri: localOutfit.imageUri }} style={styles.image} resizeMode="contain" />
+        <View
+          style={styles.imageContainer}
+          onLayout={(e) => setPreviewSize({ width: e.nativeEvent.layout.width, height: e.nativeEvent.layout.height })}
+        >
+          {previewSize.width > 0 && (
+            <OutfitPreview outfit={localOutfit} width={previewSize.width} height={previewSize.height} />
+          )}
           {!isModal && ( // Only show edit button if not in modal
             <PressableFade
               containerStyle={styles.editButtonContainer}
@@ -230,10 +237,6 @@ const styles = StyleSheet.create({
     aspectRatio: 3 / 4,
     backgroundColor: colors.thumbnail_background,
     position: "relative",
-  },
-  image: {
-    width: "100%",
-    height: "100%",
   },
   editButtonContainer: {
     position: "absolute",

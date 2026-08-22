@@ -2,7 +2,7 @@ import React, { useState, useContext, useEffect, useRef } from "react";
 import { View, Text, StyleSheet, Alert } from "react-native";
 import { SafeAreaView, Edge } from "react-native-safe-area-context";
 import { MaterialIcons } from "@expo/vector-icons";
-import ViewShot from "react-native-view-shot";
+import { captureRef } from "react-native-view-shot";
 import { OutfitStackScreenProps } from "../types/navigation";
 import { colors } from "../styles/colors";
 import { typography } from "../styles/globalStyles";
@@ -20,10 +20,6 @@ const ITEM_SIZE = 150;
 
 type Props = OutfitStackScreenProps<"OutfitCanvas">;
 
-type ViewShotRef = {
-  capture: () => Promise<string>;
-} & ViewShot;
-
 type CanvasRef = {
   deselectAll: () => void;
 };
@@ -35,9 +31,8 @@ const OutfitCanvasScreen = ({ navigation, route }: Props) => {
   const [canvasLayout, setCanvasLayout] = useState({ width: 0, height: 0 });
   const [isSaving, setIsSaving] = useState(false);
 
-  const viewShotRef = useRef<ViewShotRef>(null);
+  const canvasContainerRef = useRef<View>(null);
   const canvasRef = useRef<CanvasRef>(null);
-  const [isCapturing, setIsCapturing] = useState(false);
 
   const clothingContext = useContext(ClothingContext);
   const outfitContext = useContext(OutfitContext);
@@ -96,29 +91,37 @@ const OutfitCanvasScreen = ({ navigation, route }: Props) => {
     setCanvasItems((prev) => prev.filter((_, i) => i !== index));
   };
 
-  // Returns a temp file URI. ViewShot.capture() ignores any arguments and uses the
-  // options prop on the component below, so the format is configured there.
+  // captureRef against a plain View, rather than the <ViewShot> component: the
+  // component resolves its target through a ref that does not survive Fabric,
+  // which silently yields an empty snapshot. Expo Go always runs Fabric.
   const captureCanvas = async (): Promise<string> => {
-    if (!viewShotRef.current) {
+    if (!canvasContainerRef.current) {
       throw new Error("Canvas reference not found");
     }
 
     try {
-      // Set capturing state to true to remove background
-      setIsCapturing(true);
-      // Deselect all items before capture
+      // Deselect all items so selection chrome stays out of the snapshot
       canvasRef.current?.deselectAll();
 
-      // Wait a frame to ensure background is removed
+      // Let the deselection land before snapshotting
       await new Promise((resolve) => requestAnimationFrame(resolve));
+      await new Promise((resolve) => setTimeout(resolve, 80));
 
-      return await viewShotRef.current.capture();
+      const captureOptions = { format: "png" as const, quality: 1, result: "tmpfile" as const };
+
+      // The first snapshot of a freshly mounted tree comes back empty under
+      // Fabric: the backing native view is not realised yet. Editing an existing
+      // outfit works because that tree has already been through a render cycle.
+      // A discarded warm-up capture forces it before the one we keep.
+      await captureRef(canvasContainerRef, captureOptions);
+      await new Promise((resolve) => setTimeout(resolve, 80));
+
+      const capturedUri = await captureRef(canvasContainerRef, captureOptions);
+      console.debug("[captureCanvas] view-shot returned:", capturedUri);
+      return capturedUri;
     } catch (error) {
       console.error("Error capturing canvas:", error);
       throw error;
-    } finally {
-      // Reset capturing state
-      setIsCapturing(false);
     }
   };
 
@@ -207,17 +210,10 @@ const OutfitCanvasScreen = ({ navigation, route }: Props) => {
       </View>
 
       {/* Canvas Area */}
-      <ViewShot
-        ref={viewShotRef}
-        style={styles.canvasArea}
-        options={{
-          format: "png",
-          quality: 1,
-        }}
-      >
-        <View
-          style={[styles.canvasWrapper, { backgroundColor: isCapturing ? "transparent" : colors.thumbnail_background }]}
-        >
+      <View ref={canvasContainerRef} collapsable={false} style={styles.canvasArea}>
+        {/* collapsable={false} keeps Android from optimising these container
+            views out of the hierarchy, which leaves view-shot capturing blank */}
+        <View collapsable={false} style={[styles.canvasWrapper, styles.canvasWrapperFilled]}>
           <OutfitCanvas
             ref={canvasRef}
             items={canvasItems}
@@ -227,7 +223,7 @@ const OutfitCanvasScreen = ({ navigation, route }: Props) => {
             onUpdateZIndex={handleUpdateZIndex}
           />
         </View>
-      </ViewShot>
+      </View>
 
       {/* Bottom Buttons */}
       <View style={styles.bottomButtons}>
@@ -292,6 +288,12 @@ const styles = StyleSheet.create({
     flex: 1,
     borderRadius: 12,
     overflow: "hidden",
+  },
+  // Kept opaque during capture too: a transparent background makes the view
+  // visually inert, which Fabric is free to flatten away, and the snapshot then
+  // comes back uniformly empty
+  canvasWrapperFilled: {
+    backgroundColor: colors.thumbnail_background,
   },
   bottomButtons: {
     flexDirection: "row",

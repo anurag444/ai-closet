@@ -1,9 +1,10 @@
 import React from "react";
-import { Image, StyleSheet, View, ViewStyle } from "react-native";
+import { StyleSheet, View, ViewStyle } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Outfit } from "../../types/Outfit";
 import { colors } from "../../styles/colors";
 import PressableFade from "../common/PressableFade";
+import OutfitPreview from "./OutfitPreview";
 
 type Props = {
   outfit: Outfit;
@@ -25,7 +26,7 @@ const OutfitThumbnail = ({ outfit, width, height, onPress, onLongPress, isSelect
   return (
     <PressableFade style={[style]} onPress={onPress} onLongPress={onLongPress}>
       <View style={[styles.card, thumbnailStyle, isSelected && styles.cardSelected]}>
-        <Image source={{ uri: outfit.imageUri }} style={styles.image} resizeMode="cover" />
+        <OutfitPreview outfit={outfit} width={width} height={height} />
         {isSelectable && (
           <View style={styles.checkboxContainer}>
             <View style={[styles.checkbox, isSelected && styles.checkboxSelected]}>
@@ -48,10 +49,6 @@ const styles = StyleSheet.create({
   },
   cardSelected: {
     borderColor: colors.primary_yellow,
-  },
-  image: {
-    width: "100%",
-    height: "100%",
   },
   checkboxContainer: {
     position: "absolute",

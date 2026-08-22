@@ -21,7 +21,7 @@ type Props = {
 const CONTROL_BUTTON_SIZE = 24;
 const MIN_SCALE = 0.2;
 const MAX_SCALE = 3;
-const DEFAULT_ITEM_SIZE = 260;
+export const DEFAULT_ITEM_SIZE = 260;
 
 const DraggableClothingItem = ({
   item,
@@ -159,9 +159,9 @@ const DraggableClothingItem = ({
 
   return (
     <GestureDetector gesture={composed}>
-      <Animated.View style={[styles.container, rStyle, style]}>
+      <Animated.View collapsable={false} style={[styles.container, rStyle, style]}>
         {/* Main Image Area */}
-        <View style={[styles.imageContainer, isSelected && styles.selected]}>
+        <View collapsable={false} style={[styles.imageContainer, isSelected && styles.selected]}>
           <Image
             source={{ uri: item.backgroundRemovedImageUri || item.imageUri }}
             style={styles.image}

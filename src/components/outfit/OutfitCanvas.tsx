@@ -48,8 +48,9 @@ const OutfitCanvas = forwardRef<CanvasRef, Props>(
     }, [items]);
 
     return (
-      <View style={styles.container}>
+      <View collapsable={false} style={styles.container}>
         <Pressable
+          collapsable={false}
           onPress={handleBackgroundPress}
           style={[
             styles.canvas,
