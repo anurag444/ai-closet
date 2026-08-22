@@ -1,14 +1,11 @@
 import React, { useContext } from "react";
-import { View, Text, StyleSheet, ScrollView, Alert } from "react-native";
+import { View, Text, StyleSheet, ScrollView } from "react-native";
 import { SafeAreaView, Edge } from "react-native-safe-area-context";
-import { MaterialIcons } from "@expo/vector-icons";
 import { ClothingContext } from "../contexts/ClothingContext";
 import { OutfitContext } from "../contexts/OutfitContext";
 import { CalendarContext } from "../contexts/CalendarContext";
-import { VirtualTryOnContext } from "../contexts/VirtualTryOnContext";
 import { colors } from "../styles/colors";
 import { typography } from "../styles/globalStyles";
-import PressableFade from "../components/common/PressableFade";
 import { categories } from "../data/categories";
 import appConfig from "../../app.json";
 
@@ -30,31 +27,14 @@ const ProfileScreen = () => {
   const clothingContext = useContext(ClothingContext);
   const outfitContext = useContext(OutfitContext);
   const calendarContext = useContext(CalendarContext);
-  const tryOnContext = useContext(VirtualTryOnContext);
 
-  if (!clothingContext || !outfitContext || !calendarContext || !tryOnContext) {
+  if (!clothingContext || !outfitContext || !calendarContext) {
     return <Text>Loading...</Text>;
   }
 
   const { clothingItems, categoryData } = clothingContext;
   const { outfits } = outfitContext;
   const { entries } = calendarContext;
-  const { recentTryOns, clearHistory } = tryOnContext;
-
-  const handleClearHistory = () => {
-    if (recentTryOns.length === 0) {
-      return;
-    }
-
-    Alert.alert(
-      "Clear Try-On History",
-      `Delete all ${recentTryOns.length} try-on result${recentTryOns.length > 1 ? "s" : ""}? Your clothes and outfits are not affected.`,
-      [
-        { text: "Cancel", style: "cancel" },
-        { text: "Clear", style: "destructive", onPress: () => clearHistory() },
-      ]
-    );
-  };
 
   return (
     <SafeAreaView style={styles.container} edges={safeAreaEdges}>
@@ -65,7 +45,6 @@ const ProfileScreen = () => {
           <Stat label="Items" value={clothingItems.length} />
           <Stat label="Outfits" value={outfits.length} />
           <Stat label="Days Planned" value={entries.length} />
-          <Stat label="Try-Ons" value={recentTryOns.length} />
         </View>
 
         <Text style={styles.sectionTitle}>Closet Breakdown</Text>
@@ -76,24 +55,6 @@ const ProfileScreen = () => {
               <Text style={styles.rowValue}>{categoryData[category] ?? 0}</Text>
             </View>
           ))}
-        </View>
-
-        <Text style={styles.sectionTitle}>Data</Text>
-        <View style={styles.card}>
-          <PressableFade
-            style={styles.row}
-            onPress={handleClearHistory}
-            disabled={recentTryOns.length === 0}
-          >
-            <Text style={[styles.rowLabel, recentTryOns.length === 0 && styles.rowLabelDisabled]}>
-              Clear try-on history
-            </Text>
-            <MaterialIcons
-              name="chevron-right"
-              size={24}
-              color={recentTryOns.length === 0 ? colors.text_gray_light : colors.icon_stroke}
-            />
-          </PressableFade>
         </View>
 
         <Text style={styles.version}>Version {appConfig.expo.version}</Text>
@@ -167,9 +128,6 @@ const styles = StyleSheet.create({
     fontFamily: typography.medium,
     fontSize: 15,
     color: colors.text_primary,
-  },
-  rowLabelDisabled: {
-    color: colors.text_gray_light,
   },
   rowValue: {
     fontFamily: typography.semiBold,

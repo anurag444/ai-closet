@@ -3,24 +3,21 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { Platform, StyleSheet } from "react-native";
-import { MaterialIcons, MaterialCommunityIcons, FontAwesome6 } from "@expo/vector-icons";
+import { MaterialIcons, MaterialCommunityIcons } from "@expo/vector-icons";
 import ClothingManagementScreen from "../screens/ClothingManagementScreen";
 import ClothingDetailScreen from "../screens/ClothingDetailScreen";
 import OutfitManagementScreen from "../screens/OutfitManagementScreen";
 import OutfitCanvasScreen from "../screens/OutfitCanvasScreen";
 import OutfitDetailScreen from "../screens/OutfitDetailScreen";
-import VirtualTryOnScreen from "../screens/VirtualTryOnScreen";
 import OutfitPlanScreen from "../screens/OutfitPlanScreen";
 import SelectOutfitModalScreen from "../screens/SelectOutfitModalScreen";
 import ProfileScreen from "../screens/ProfileScreen";
-import { colors } from "../styles/colors";
-import { typography } from "../styles/globalStyles";
+import { palette, spacing, fontFamily, fontSize } from "../styles/theme";
 import {
   RootStackParamList,
   MainTabParamList,
   ClosetStackParamList,
   OutfitStackParamList,
-  TryOnStackParamList,
   PlanStackParamList,
   ProfileStackParamList,
 } from "../types/navigation";
@@ -29,7 +26,6 @@ const RootStack = createNativeStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator<MainTabParamList>();
 const ClosetStack = createNativeStackNavigator<ClosetStackParamList>();
 const OutfitStack = createNativeStackNavigator<OutfitStackParamList>();
-const TryOnStack = createNativeStackNavigator<TryOnStackParamList>();
 const PlanStack = createNativeStackNavigator<PlanStackParamList>();
 const ProfileStack = createNativeStackNavigator<ProfileStackParamList>();
 
@@ -47,12 +43,6 @@ const OutfitStackNavigator = () => (
     <OutfitStack.Screen name="OutfitCanvas" component={OutfitCanvasScreen} />
     <OutfitStack.Screen name="OutfitDetail" component={OutfitDetailScreen} />
   </OutfitStack.Navigator>
-);
-
-const TryOnStackNavigator = () => (
-  <TryOnStack.Navigator screenOptions={{ headerShown: false }}>
-    <TryOnStack.Screen name="VirtualTryOn" component={VirtualTryOnScreen} />
-  </TryOnStack.Navigator>
 );
 
 const PlanStackNavigator = () => (
@@ -73,8 +63,8 @@ const MainTabNavigator = () => (
     screenOptions={{
       headerShown: false,
       tabBarStyle: styles.tabBar,
-      tabBarActiveTintColor: colors.text_primary,
-      tabBarInactiveTintColor: colors.text_gray,
+      tabBarActiveTintColor: palette.rose_deep,
+      tabBarInactiveTintColor: palette.ink_faint,
       tabBarLabelStyle: styles.tabBarLabel,
       tabBarIconStyle: styles.tabBarIcon,
     }}
@@ -91,14 +81,6 @@ const MainTabNavigator = () => (
       component={OutfitStackNavigator}
       options={{
         tabBarIcon: ({ color, size }) => <MaterialIcons name="style" size={size} color={color} />,
-      }}
-    />
-    <Tab.Screen
-      name="TryOn"
-      component={TryOnStackNavigator}
-      options={{
-        tabBarLabel: "Try-On",
-        tabBarIcon: ({ color, size }) => <FontAwesome6 name="wand-magic-sparkles" size={20} color={color} />,
       }}
     />
     <Tab.Screen
@@ -138,21 +120,21 @@ const AppNavigator = () => {
 
 const styles = StyleSheet.create({
   tabBar: {
-    height: Platform.OS === "ios" ? 90 : 60,
-    paddingBottom: Platform.OS === "ios" ? 32 : 10,
-    paddingTop: 10,
-    backgroundColor: colors.screen_background,
-    borderTopColor: colors.divider_light,
+    height: Platform.OS === "ios" ? 90 : 64,
+    paddingBottom: Platform.OS === "ios" ? 32 : spacing.md,
+    paddingTop: spacing.md,
+    backgroundColor: palette.shell,
+    borderTopColor: palette.line,
     borderTopWidth: 1,
     elevation: 0,
   },
   tabBarLabel: {
-    fontFamily: typography.medium,
-    fontSize: 12,
-    marginTop: 4,
+    fontFamily: fontFamily.medium,
+    fontSize: fontSize.caption,
+    marginTop: spacing.xs,
   },
   tabBarIcon: {
-    marginTop: 4,
+    marginTop: spacing.xs,
   },
 });
 

@@ -12,7 +12,6 @@ export type RootStackParamList = {
 export type MainTabParamList = {
   Closet: NavigatorScreenParams<ClosetStackParamList>;
   Outfits: NavigatorScreenParams<OutfitStackParamList>;
-  TryOn: NavigatorScreenParams<TryOnStackParamList>;
   Plan: NavigatorScreenParams<PlanStackParamList>;
   Profile: NavigatorScreenParams<ProfileStackParamList>;
 };
