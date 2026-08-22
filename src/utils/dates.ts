@@ -94,6 +94,15 @@ export const isToday = (date: Date): boolean => isSameDay(date, new Date());
 
 export const formatMonthYear = (date: Date): string => `${MONTH_NAMES[date.getMonth()]} ${date.getFullYear()}`;
 
+// 'YYYY-MM', the shape YearMonthPicker speaks
+export const toMonthKey = (date: Date): string =>
+  `${date.getFullYear()}-${`${date.getMonth() + 1}`.padStart(2, "0")}`;
+
+export const fromMonthKey = (monthKey: string): Date => {
+  const [year, month] = monthKey.split("-").map(Number);
+  return new Date(year, month - 1, 1);
+};
+
 export const formatMonthDay = (date: Date): string => `${MONTH_ABBREVIATIONS[date.getMonth()]} ${date.getDate()}`;
 
 export const formatShortDate = (date: Date): string =>

@@ -4,22 +4,30 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { colors } from "../../styles/colors";
 import { typography } from "../../styles/globalStyles";
 import PressableFade from "../common/PressableFade";
-import { formatMonthYear } from "../../utils/dates";
+import YearMonthPicker from "../common/YearMonthPicker";
+import { formatMonthYear, toMonthKey } from "../../utils/dates";
 
 type Props = {
   anchorDate: Date;
   onPrevious: () => void;
   onNext: () => void;
   onToday: () => void;
+  onMonthChange: (monthKey: string) => void;
   isTodayVisible: boolean;
 };
 
-const WeekHeader = ({ anchorDate, onPrevious, onNext, onToday, isTodayVisible }: Props) => (
+const CalendarHeader = ({ anchorDate, onPrevious, onNext, onToday, onMonthChange, isTodayVisible }: Props) => (
   <View style={styles.container}>
-    <Text style={styles.monthLabel}>{formatMonthYear(anchorDate)}</Text>
+    {/* The month label doubles as the jump-to-month trigger */}
+    <YearMonthPicker selectedDate={toMonthKey(anchorDate)} onValueChange={onMonthChange} title="Jump to Month">
+      <View style={styles.monthLabelRow}>
+        <Text style={styles.monthLabel}>{formatMonthYear(anchorDate)}</Text>
+        <MaterialIcons name="arrow-drop-down" size={24} color={colors.icon_stroke} />
+      </View>
+    </YearMonthPicker>
 
     <View style={styles.controls}>
-      {/* Nothing to jump back to while the current week is already on screen */}
+      {/* Nothing to jump back to while today is already on screen */}
       {!isTodayVisible && (
         <PressableFade style={styles.todayButton} onPress={onToday}>
           <Text style={styles.todayLabel}>Today</Text>
@@ -44,6 +52,10 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingHorizontal: 16,
     paddingBottom: 12,
+  },
+  monthLabelRow: {
+    flexDirection: "row",
+    alignItems: "center",
   },
   monthLabel: {
     fontSize: 20,
@@ -72,4 +84,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default WeekHeader;
+export default CalendarHeader;

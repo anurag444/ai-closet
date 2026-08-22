@@ -35,9 +35,17 @@ type Props = {
   selectedDate: string; // Format: 'YYYY-MM'
   onValueChange: (date: string) => void;
   disabled?: boolean;
+  title?: string;
+  children?: React.ReactNode; // Replaces the default value row as the trigger
 };
 
-const YearMonthPicker = ({ selectedDate, onValueChange, disabled = false }: Props) => {
+const YearMonthPicker = ({
+  selectedDate,
+  onValueChange,
+  disabled = false,
+  title = "Select Purchase Date",
+  children,
+}: Props) => {
   const [isModalVisible, setModalVisible] = useState(false);
   const [tempMonth, setTempMonth] = useState<number>(
     selectedDate ? parseInt(selectedDate.split("-")[1]) - 1 : new Date().getMonth()
@@ -78,7 +86,7 @@ const YearMonthPicker = ({ selectedDate, onValueChange, disabled = false }: Prop
             <PressableFade onPress={() => setModalVisible(false)} style={styles.headerButton}>
               <Text style={styles.headerButtonText}>Cancel</Text>
             </PressableFade>
-            <Text style={styles.headerTitle}>Select Purchase Date</Text>
+            <Text style={styles.headerTitle}>{title}</Text>
             <PressableFade onPress={handleConfirm} style={styles.headerButton}>
               <Text style={[styles.headerButtonText, { color: colors.primary_yellow }]}>Done</Text>
             </PressableFade>
@@ -143,16 +151,18 @@ const YearMonthPicker = ({ selectedDate, onValueChange, disabled = false }: Prop
         onPress={() => !disabled && setModalVisible(true)}
         disabled={disabled}
       >
-        <View style={styles.valueContainer}>
-          <Text style={[styles.value, disabled && styles.valueDisabled]} numberOfLines={1}>
-            {formatDisplayDate(selectedDate)}
-          </Text>
-          <MaterialCommunityIcons
-            name="chevron-right"
-            size={ICON.SIZE}
-            color={disabled ? colors.text_gray_light : colors.text_gray}
-          />
-        </View>
+        {children ?? (
+          <View style={styles.valueContainer}>
+            <Text style={[styles.value, disabled && styles.valueDisabled]} numberOfLines={1}>
+              {formatDisplayDate(selectedDate)}
+            </Text>
+            <MaterialCommunityIcons
+              name="chevron-right"
+              size={ICON.SIZE}
+              color={disabled ? colors.text_gray_light : colors.text_gray}
+            />
+          </View>
+        )}
       </PressableFade>
       {renderModal()}
     </View>

@@ -13,12 +13,12 @@
 | M3 | Calendar model, context, empty 5th tab | ✅ Done, verified on device |
 | M4 | Week view (read-only) | ✅ Done, verified on device |
 | M5 | Assign an outfit to a date | ✅ Done, verified on device |
-| M6 | Day actions: view / replace / remove | ✅ Done — awaiting your device verification (uncommitted) |
-| M7 | Month view + toggle | ⬜ Not started |
+| M6 | Day actions: view / replace / remove | ✅ Done, verified on device |
+| M7 | Month view + toggle | ✅ Done — awaiting your device verification (uncommitted) |
 | M8 | Profile tab | ⬜ Not started |
 | M9 | Cleanup (`FilterButton.tsx`, README) | ⬜ Not started |
 
-**Next up:** M7.
+**Next up:** M8.
 
 **Process:** nothing gets committed until Anurag has verified it on a device.
 
@@ -60,6 +60,8 @@ Target: a 5-tab app where the Plan tab opens on a week view (toggleable to month
 **5. The load/save effects were racing.** Each context ran its load effect and its save effect on the same mount. The save fired immediately with the initial `[]`, and because both hit the same native AsyncStorage queue, that write could land before `getItem` resolved — reading back `[]` and wiping stored data. Rare, and more likely on a cold start with a large closet, but it was real. `usePersistedState` gates the save on `isHydrated`.
 
 **6. `OutfitContext` exposes `isHydrated`.** `CalendarContext` prunes entries whose outfit was deleted, but on a cold start `outfits` is `[]` until storage resolves — so every entry would look orphaned and get wiped. Both the display filter and the prune effect are gated on outfits having actually loaded. `usePersistedState` already returned the flag; it was just being discarded.
+
+**8. `WeekHeader` became `CalendarHeader`, and `YearMonthPicker` gained two optional props.** The header serves both views, so the week-specific name stopped fitting. `YearMonthPicker` had a hardcoded "Select Purchase Date" modal title and a fixed right-aligned trigger; it now takes an optional `title` and optional `children` to replace the trigger. Both default to the previous behavior, so `ClothingDetailScreen` is untouched.
 
 **7. Assignment goes through the context, not a navigation callback.** `SelectOutfitModal` calls `setOutfitForDate` itself and then `goBack()`. Passing an `onSelect` function through route params would put a non-serializable value into navigation state, which React Navigation warns about and which breaks state persistence.
 
@@ -120,7 +122,7 @@ Target: a 5-tab app where the Plan tab opens on a week view (toggleable to month
 
 **Verify:** All three actions. Then delete that outfit from the Outfits tab — the day goes empty rather than showing a broken thumbnail (exercises the M3 orphan prune).
 
-### M7 — Month view + toggle
+### M7 — Month view + toggle ✅
 - `src/components/calendar/MonthView.tsx`: 6×7 grid from `getMonthGrid`, small square thumbnails, adjacent-month days dimmed with `colors.text_gray_light`.
 - Toggle goes live; chevrons dispatch to `addWeeks` or `addMonths` on the same `anchorDate` so switching keeps your place.
 - Month cells reuse `DayCard`'s handlers — no duplicated navigation logic.

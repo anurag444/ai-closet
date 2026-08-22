@@ -3,12 +3,14 @@ import { View, Text, StyleSheet } from "react-native";
 import { SafeAreaView, Edge } from "react-native-safe-area-context";
 import { colors } from "../styles/colors";
 import { typography } from "../styles/globalStyles";
-import WeekHeader from "../components/calendar/WeekHeader";
+import CalendarHeader from "../components/calendar/CalendarHeader";
+import CalendarViewToggle, { CalendarViewMode } from "../components/calendar/CalendarViewToggle";
 import WeekView from "../components/calendar/WeekView";
+import MonthView from "../components/calendar/MonthView";
 import DayActionSheet from "../components/calendar/DayActionSheet";
 import { CalendarContext } from "../contexts/CalendarContext";
 import { PlanStackScreenProps } from "../types/navigation";
-import { addWeeks, getWeekDays, isToday, startOfDay } from "../utils/dates";
+import { addMonths, addWeeks, fromMonthKey, getWeekDays, isToday, startOfDay } from "../utils/dates";
 
 type Props = PlanStackScreenProps<"OutfitPlan">;
 
@@ -21,13 +23,27 @@ const safeAreaEdges: Edge[] = ["top", "left", "right"];
 
 const OutfitPlanScreen = ({ navigation }: Props) => {
   const [anchorDate, setAnchorDate] = useState(() => startOfDay(new Date()));
+  const [viewMode, setViewMode] = useState<CalendarViewMode>("week");
   const [activeDay, setActiveDay] = useState<ActiveDay | null>(null);
 
   const calendarContext = useContext(CalendarContext);
 
-  const handlePrevious = useCallback(() => setAnchorDate((prev) => addWeeks(prev, -1)), []);
-  const handleNext = useCallback(() => setAnchorDate((prev) => addWeeks(prev, 1)), []);
+  const isMonthView = viewMode === "month";
+
+  // Both views page the same anchor, so switching keeps your place
+  const handlePrevious = useCallback(
+    () => setAnchorDate((prev) => (isMonthView ? addMonths(prev, -1) : addWeeks(prev, -1))),
+    [isMonthView]
+  );
+
+  const handleNext = useCallback(
+    () => setAnchorDate((prev) => (isMonthView ? addMonths(prev, 1) : addWeeks(prev, 1))),
+    [isMonthView]
+  );
+
   const handleToday = useCallback(() => setAnchorDate(startOfDay(new Date())), []);
+
+  const handleMonthChange = useCallback((monthKey: string) => setAnchorDate(fromMonthKey(monthKey)), []);
 
   const openOutfitPicker = useCallback(
     (dateKey: string) => navigation.navigate("SelectOutfitModal", { dateKey }),
@@ -68,23 +84,32 @@ const OutfitPlanScreen = ({ navigation }: Props) => {
     setActiveDay(null);
   }, [activeDay, calendarContext]);
 
-  const isTodayVisible = getWeekDays(anchorDate).some(isToday);
+  const today = new Date();
+  const isTodayVisible = isMonthView
+    ? anchorDate.getMonth() === today.getMonth() && anchorDate.getFullYear() === today.getFullYear()
+    : getWeekDays(anchorDate).some(isToday);
 
   return (
     <SafeAreaView style={styles.container} edges={safeAreaEdges}>
       <View style={styles.titleRow}>
         <Text style={styles.title}>Plan</Text>
+        <CalendarViewToggle viewMode={viewMode} onChange={setViewMode} />
       </View>
 
-      <WeekHeader
+      <CalendarHeader
         anchorDate={anchorDate}
         onPrevious={handlePrevious}
         onNext={handleNext}
         onToday={handleToday}
+        onMonthChange={handleMonthChange}
         isTodayVisible={isTodayVisible}
       />
 
-      <WeekView anchorDate={anchorDate} onSelectDate={handleSelectDate} />
+      {isMonthView ? (
+        <MonthView anchorDate={anchorDate} onSelectDate={handleSelectDate} />
+      ) : (
+        <WeekView anchorDate={anchorDate} onSelectDate={handleSelectDate} />
+      )}
 
       <DayActionSheet
         dateKey={activeDay?.dateKey ?? null}
@@ -103,6 +128,9 @@ const styles = StyleSheet.create({
     backgroundColor: colors.screen_background,
   },
   titleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     paddingHorizontal: 16,
     paddingTop: 16,
     paddingBottom: 12,
