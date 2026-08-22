@@ -14,7 +14,7 @@ export type MainTabParamList = {
   Outfits: NavigatorScreenParams<OutfitStackParamList>;
   TryOn: NavigatorScreenParams<TryOnStackParamList>;
   Plan: NavigatorScreenParams<PlanStackParamList>;
-  Profile: undefined;
+  Profile: NavigatorScreenParams<ProfileStackParamList>;
 };
 
 export type ClosetStackParamList = {
@@ -34,6 +34,10 @@ export type TryOnStackParamList = {
 
 export type PlanStackParamList = {
   OutfitPlan: undefined;
+};
+
+export type ProfileStackParamList = {
+  Profile: undefined;
 };
 
 // Screen Props Types
@@ -61,6 +65,11 @@ export type TryOnStackScreenProps<T extends keyof TryOnStackParamList> = Composi
 
 export type PlanStackScreenProps<T extends keyof PlanStackParamList> = CompositeScreenProps<
   NativeStackScreenProps<PlanStackParamList, T>,
+  CompositeScreenProps<BottomTabScreenProps<MainTabParamList>, NativeStackScreenProps<RootStackParamList>>
+>;
+
+export type ProfileStackScreenProps<T extends keyof ProfileStackParamList> = CompositeScreenProps<
+  NativeStackScreenProps<ProfileStackParamList, T>,
   CompositeScreenProps<BottomTabScreenProps<MainTabParamList>, NativeStackScreenProps<RootStackParamList>>
 >;
 

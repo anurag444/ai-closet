@@ -14,11 +14,11 @@
 | M4 | Week view (read-only) | ✅ Done, verified on device |
 | M5 | Assign an outfit to a date | ✅ Done, verified on device |
 | M6 | Day actions: view / replace / remove | ✅ Done, verified on device |
-| M7 | Month view + toggle | ✅ Done — awaiting your device verification (uncommitted) |
-| M8 | Profile tab | ⬜ Not started |
+| M7 | Month view + toggle | ✅ Done, verified on device |
+| M8 | Profile tab | ✅ Done — awaiting your device verification (uncommitted) |
 | M9 | Cleanup (`FilterButton.tsx`, README) | ⬜ Not started |
 
-**Next up:** M8.
+**Next up:** M9.
 
 **Process:** nothing gets committed until Anurag has verified it on a device.
 
@@ -130,7 +130,7 @@ Target: a 5-tab app where the Plan tab opens on a week view (toggleable to month
 
 **Verify:** Toggle both ways, dates line up. Scroll several months. Assign/remove from month view. ~15 assigned days scrolls smoothly.
 
-### M8 — Profile tab
+### M8 — Profile tab ✅
 - `src/screens/ProfileScreen.tsx` + stack, mirroring `TryOnStackNavigator`, replacing the stub.
 - Counts of items / outfits / planned days / try-ons; category breakdown from `ClothingContext.categoryData`; "Clear try-on history" wired to the existing `VirtualTryOnContext.clearHistory`; version from `app.json`.
 

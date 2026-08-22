@@ -12,6 +12,7 @@ import OutfitDetailScreen from "../screens/OutfitDetailScreen";
 import VirtualTryOnScreen from "../screens/VirtualTryOnScreen";
 import OutfitPlanScreen from "../screens/OutfitPlanScreen";
 import SelectOutfitModalScreen from "../screens/SelectOutfitModalScreen";
+import ProfileScreen from "../screens/ProfileScreen";
 import { colors } from "../styles/colors";
 import { typography } from "../styles/globalStyles";
 import {
@@ -21,6 +22,7 @@ import {
   OutfitStackParamList,
   TryOnStackParamList,
   PlanStackParamList,
+  ProfileStackParamList,
 } from "../types/navigation";
 
 const RootStack = createNativeStackNavigator<RootStackParamList>();
@@ -29,8 +31,7 @@ const ClosetStack = createNativeStackNavigator<ClosetStackParamList>();
 const OutfitStack = createNativeStackNavigator<OutfitStackParamList>();
 const TryOnStack = createNativeStackNavigator<TryOnStackParamList>();
 const PlanStack = createNativeStackNavigator<PlanStackParamList>();
-
-const ProfileScreen = () => <></>;
+const ProfileStack = createNativeStackNavigator<ProfileStackParamList>();
 
 // Stack Navigators
 const ClosetStackNavigator = () => (
@@ -58,6 +59,12 @@ const PlanStackNavigator = () => (
   <PlanStack.Navigator screenOptions={{ headerShown: false }}>
     <PlanStack.Screen name="OutfitPlan" component={OutfitPlanScreen} />
   </PlanStack.Navigator>
+);
+
+const ProfileStackNavigator = () => (
+  <ProfileStack.Navigator screenOptions={{ headerShown: false }}>
+    <ProfileStack.Screen name="Profile" component={ProfileScreen} />
+  </ProfileStack.Navigator>
 );
 
 // Main Tab Navigator
@@ -105,7 +112,7 @@ const MainTabNavigator = () => (
     />
     <Tab.Screen
       name="Profile"
-      component={ProfileScreen}
+      component={ProfileStackNavigator}
       options={{
         tabBarIcon: ({ color, size }) => <MaterialIcons name="person" size={size} color={color} />,
       }}
