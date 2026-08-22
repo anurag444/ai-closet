@@ -11,7 +11,7 @@ import PressableFade from "../components/common/PressableFade";
 import TagFilterSection from "../components/common/TagFilterSection";
 import { RootStackScreenProps } from "../types/navigation";
 import { Outfit } from "../types/Outfit";
-import { fromDateKey, MONTH_ABBREVIATIONS } from "../utils/dates";
+import { fromDateKey, formatMonthDay } from "../utils/dates";
 
 type Props = RootStackScreenProps<"SelectOutfitModal">;
 
@@ -23,11 +23,6 @@ const ITEM_WIDTH = (SCREEN_WIDTH - GRID_PADDING * 2 - GRID_SPACING * (COLUMN_COU
 const ITEM_HEIGHT = (ITEM_WIDTH * 4) / 3; // 3:4 aspect ratio
 
 const safeAreaEdges: Edge[] = ["top", "left", "right"];
-
-const formatDateLabel = (dateKey: string) => {
-  const date = fromDateKey(dateKey);
-  return `${MONTH_ABBREVIATIONS[date.getMonth()]} ${date.getDate()}`;
-};
 
 const SelectOutfitModalScreen = ({ navigation, route }: Props) => {
   const { dateKey } = route.params;
@@ -81,7 +76,7 @@ const SelectOutfitModalScreen = ({ navigation, route }: Props) => {
   return (
     <SafeAreaView style={styles.container} edges={safeAreaEdges}>
       <View style={styles.header}>
-        <Text style={styles.title}>Plan {formatDateLabel(dateKey)}</Text>
+        <Text style={styles.title}>Plan {formatMonthDay(fromDateKey(dateKey))}</Text>
         <PressableFade onPress={() => navigation.goBack()}>
           <MaterialIcons name="close" size={24} color={colors.icon_stroke} />
         </PressableFade>

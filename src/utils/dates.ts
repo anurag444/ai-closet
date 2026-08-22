@@ -93,3 +93,8 @@ export const isSameDay = (a: Date, b: Date): boolean => toDateKey(a) === toDateK
 export const isToday = (date: Date): boolean => isSameDay(date, new Date());
 
 export const formatMonthYear = (date: Date): string => `${MONTH_NAMES[date.getMonth()]} ${date.getFullYear()}`;
+
+export const formatMonthDay = (date: Date): string => `${MONTH_ABBREVIATIONS[date.getMonth()]} ${date.getDate()}`;
+
+export const formatShortDate = (date: Date): string =>
+  `${WEEKDAY_ABBREVIATIONS[date.getDay()]}, ${formatMonthDay(date)}`;

@@ -7,7 +7,7 @@ import { getWeekDays, toDateKey } from "../../utils/dates";
 
 type Props = {
   anchorDate: Date;
-  onSelectDate: (dateKey: string) => void;
+  onSelectDate: (dateKey: string, outfitId?: string) => void;
 };
 
 const WeekView = ({ anchorDate, onSelectDate }: Props) => {
@@ -23,7 +23,7 @@ const WeekView = ({ anchorDate, onSelectDate }: Props) => {
         const entry = calendarContext?.getEntryForDate(dateKey);
         const outfit = entry ? outfitContext?.getOutfit(entry.outfitId) : undefined;
 
-        return <DayCard key={dateKey} date={day} outfit={outfit} onPress={() => onSelectDate(dateKey)} />;
+        return <DayCard key={dateKey} date={day} outfit={outfit} onPress={() => onSelectDate(dateKey, outfit?.id)} />;
       })}
     </ScrollView>
   );

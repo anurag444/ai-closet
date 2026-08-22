@@ -12,13 +12,13 @@
 | M2 | Persistence helper + context refactor | ✅ Done, verified on device |
 | M3 | Calendar model, context, empty 5th tab | ✅ Done, verified on device |
 | M4 | Week view (read-only) | ✅ Done, verified on device |
-| M5 | Assign an outfit to a date | ✅ Done — awaiting your device verification (uncommitted) |
-| M6 | Day actions: view / replace / remove | ⬜ Not started |
+| M5 | Assign an outfit to a date | ✅ Done, verified on device |
+| M6 | Day actions: view / replace / remove | ✅ Done — awaiting your device verification (uncommitted) |
 | M7 | Month view + toggle | ⬜ Not started |
 | M8 | Profile tab | ⬜ Not started |
 | M9 | Cleanup (`FilterButton.tsx`, README) | ⬜ Not started |
 
-**Next up:** M6.
+**Next up:** M7.
 
 **Process:** nothing gets committed until Anurag has verified it on a device.
 
@@ -115,7 +115,7 @@ Target: a 5-tab app where the Plan tab opens on a week view (toggleable to month
 
 **Verify:** Empty day → modal → pick → thumbnail appears. Relaunch, still assigned. Re-pick on the same day replaces rather than duplicates.
 
-### M6 — Day actions
+### M6 — Day actions ✅
 - Filled `DayCard` opens a bottom sheet (`Modal` + `transparent` + `colors.background_dim`, per `components/virtualTryOn/TryOnOptionSheet.tsx`): View outfit → existing `OutfitDetailModal` route; Replace → M5 flow; Remove → `removeEntryForDate`.
 
 **Verify:** All three actions. Then delete that outfit from the Outfits tab — the day goes empty rather than showing a broken thumbnail (exercises the M3 orphan prune).
